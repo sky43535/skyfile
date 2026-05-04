@@ -1,7 +1,5 @@
 #!/bin/bash
 
-#!/bin/bash
-
 set -e
 
 REPO="sky43535/skyfile"
@@ -55,20 +53,26 @@ esac
 echo ""
 echo -e "${YELLOW}⬇ Downloading latest SkyFile...${RESET}"
 
-curl -L --fail --progress-bar "$URL" -o "$BINARY"
+# ─────────────────────────────
+# SAFE DOWNLOAD (fixes your crash)
+# ─────────────────────────────
+
+TMP_FILE="$(mktemp)"
+
+curl -L --fail --progress-bar "$URL" -o "$TMP_FILE"
 
 echo ""
 echo -e "${YELLOW}🔧 Setting permissions...${RESET}"
-chmod +x "$BINARY"
+chmod +x "$TMP_FILE"
 
 echo -e "${YELLOW}📦 Installing to system...${RESET}"
 
 DEST="/usr/local/bin/skyfile"
 
 if [ -w "$(dirname "$DEST")" ]; then
-    mv "$BINARY" "$DEST"
+    mv "$TMP_FILE" "$DEST"
 else
-    sudo mv "$BINARY" "$DEST"
+    sudo mv "$TMP_FILE" "$DEST"
 fi
 
 echo ""
