@@ -1,25 +1,79 @@
 #!/bin/bash
 
+#!/bin/bash
+
 set -e
 
 REPO="sky43535/skyfile"
+BINARY="skyfile"
+URL="https://github.com/$REPO/releases/latest/download/$BINARY"
 
+# ─────────────────────────────
+# Colors
+# ─────────────────────────────
+
+RESET="\033[0m"
+GREEN="\033[1;32m"
+BLUE="\033[1;34m"
+CYAN="\033[1;36m"
+YELLOW="\033[1;33m"
+RED="\033[1;31m"
+
+clear
+
+echo -e "${CYAN}"
+echo "  ███████╗██╗  ██╗██╗   ██╗███████╗██╗██╗     "
+echo "  ██╔════╝██║ ██╔╝██║   ██║██╔════╝██║██║     "
+echo "  ███████╗█████╔╝ ██║   ██║█████╗  ██║██║     "
+echo "  ╚════██║██╔═██╗ ██║   ██║██╔══╝  ██║██║     "
+echo "  ███████║██║  ██╗╚██████╔╝██║     ██║███████╗"
+echo "  ╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝     ╚═╝╚══════╝"
+echo -e "${RESET}"
+
+echo -e "${BLUE}Welcome to SkyFile Installer${RESET}"
+echo -e "${CYAN}──────────────────────────────────────${RESET}"
+echo ""
+
+# Detect OS
 OS="$(uname -s)"
 
-echo "Installing skyfile..."
+echo -e "${YELLOW}🔍 Detecting system...${RESET}"
 
-if [ "$OS" = "Darwin" ]; then
-    URL="https://github.com/$REPO/releases/latest/download/skyfile"
-elif [ "$OS" = "Linux" ]; then
-    URL="https://github.com/$REPO/releases/latest/download/skyfile"
-else
-    echo "Unsupported OS: $OS"
+case "$OS" in
+  Darwin)
+    echo -e "${GREEN}✔ macOS detected${RESET}"
+    ;;
+  Linux)
+    echo -e "${GREEN}✔ Linux detected${RESET}"
+    ;;
+  *)
+    echo -e "${RED}✖ Unsupported system: $OS${RESET}"
     exit 1
+    ;;
+esac
+
+echo ""
+echo -e "${YELLOW}⬇ Downloading latest SkyFile...${RESET}"
+
+curl -L --fail --progress-bar "$URL" -o "$BINARY"
+
+echo ""
+echo -e "${YELLOW}🔧 Setting permissions...${RESET}"
+chmod +x "$BINARY"
+
+echo -e "${YELLOW}📦 Installing to system...${RESET}"
+
+DEST="/usr/local/bin/skyfile"
+
+if [ -w "$(dirname "$DEST")" ]; then
+    mv "$BINARY" "$DEST"
+else
+    sudo mv "$BINARY" "$DEST"
 fi
 
-curl -L "$URL" -o skyfile
-chmod +x skyfile
-sudo mv skyfile /usr/local/bin/skyfile
-
-echo "Installed skyfile successfully!"
-skyfile --help
+echo ""
+echo -e "${CYAN}──────────────────────────────────────${RESET}"
+echo -e "${GREEN}✨ SkyFile installed successfully!${RESET}"
+echo -e "${BLUE}👉 Run: skyfile --help${RESET}"
+echo -e "${CYAN}──────────────────────────────────────${RESET}"
+echo ""
